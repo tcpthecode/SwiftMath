@@ -933,12 +933,12 @@ class MTTypesetter {
     }
     
     func makeRadical(_ radicand:MTMathList?, range:NSRange) -> MTRadicalDisplay? {
-        let innerDisplay = MTTypesetter.createLineForMathList(radicand, font:font, style:style, cramped:true)!
+        guard let innerDisplay = MTTypesetter.createLineForMathList(radicand, font:font, style:style, cramped:true) else { return nil }
         var clearance = self.radicalVerticalGap()
         let radicalRuleThickness = styleFont.mathTable!.radicalRuleThickness
         let radicalHeight = innerDisplay.ascent + innerDisplay.descent + clearance + radicalRuleThickness
-        
-        let glyph = self.getRadicalGlyphWithHeight(radicalHeight)!
+
+        guard let glyph = self.getRadicalGlyphWithHeight(radicalHeight) else { return nil }
         
         // Note this is a departure from Latex. Latex assumes that glyphAscent == thickness.
         // Open type math makes no such assumption, and ascent and descent are independent of the thickness.
@@ -1298,25 +1298,27 @@ class MTTypesetter {
     // MARK: - Underline/Overline
     
     func makeUnderline(_ under:MTUnderLine?) -> MTDisplay? {
-        let innerListDisplay = MTTypesetter.createLineForMathList(under!.innerList, font:font, style:style, cramped:cramped)
-        let underDisplay = MTLineDisplay(withInner: innerListDisplay, position: currentPosition, range: under!.indexRange)
+        guard let under = under else { return nil }
+        guard let innerListDisplay = MTTypesetter.createLineForMathList(under.innerList, font:font, style:style, cramped:cramped) else { return nil }
+        let underDisplay = MTLineDisplay(withInner: innerListDisplay, position: currentPosition, range: under.indexRange)
         // Move the line down by the vertical gap.
-        underDisplay.lineShiftUp = -(innerListDisplay!.descent + styleFont.mathTable!.underbarVerticalGap);
+        underDisplay.lineShiftUp = -(innerListDisplay.descent + styleFont.mathTable!.underbarVerticalGap);
         underDisplay.lineThickness = styleFont.mathTable!.underbarRuleThickness;
-        underDisplay.ascent = innerListDisplay!.ascent
-        underDisplay.descent = innerListDisplay!.descent + styleFont.mathTable!.underbarVerticalGap + styleFont.mathTable!.underbarRuleThickness + styleFont.mathTable!.underbarExtraDescender;
-        underDisplay.width = innerListDisplay!.width;
+        underDisplay.ascent = innerListDisplay.ascent
+        underDisplay.descent = innerListDisplay.descent + styleFont.mathTable!.underbarVerticalGap + styleFont.mathTable!.underbarRuleThickness + styleFont.mathTable!.underbarExtraDescender;
+        underDisplay.width = innerListDisplay.width;
         return underDisplay;
     }
-    
+
     func makeOverline(_ over:MTOverLine?) -> MTDisplay? {
-        let innerListDisplay = MTTypesetter.createLineForMathList(over!.innerList, font:font, style:style, cramped:true)
-        let overDisplay = MTLineDisplay(withInner:innerListDisplay, position:currentPosition, range:over!.indexRange)
-        overDisplay.lineShiftUp = innerListDisplay!.ascent + styleFont.mathTable!.overbarVerticalGap;
+        guard let over = over else { return nil }
+        guard let innerListDisplay = MTTypesetter.createLineForMathList(over.innerList, font:font, style:style, cramped:true) else { return nil }
+        let overDisplay = MTLineDisplay(withInner:innerListDisplay, position:currentPosition, range:over.indexRange)
+        overDisplay.lineShiftUp = innerListDisplay.ascent + styleFont.mathTable!.overbarVerticalGap;
         overDisplay.lineThickness = styleFont.mathTable!.underbarRuleThickness;
-        overDisplay.ascent = innerListDisplay!.ascent + styleFont.mathTable!.overbarVerticalGap + styleFont.mathTable!.overbarRuleThickness + styleFont.mathTable!.overbarExtraAscender;
-        overDisplay.descent = innerListDisplay!.descent;
-        overDisplay.width = innerListDisplay!.width;
+        overDisplay.ascent = innerListDisplay.ascent + styleFont.mathTable!.overbarVerticalGap + styleFont.mathTable!.overbarRuleThickness + styleFont.mathTable!.overbarExtraAscender;
+        overDisplay.descent = innerListDisplay.descent;
+        overDisplay.width = innerListDisplay.width;
         return overDisplay;
     }
     

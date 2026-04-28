@@ -1418,14 +1418,16 @@ public struct MTMathListBuilder {
             }
         } else if command == "color" {
             // A color command has 2 arguments
+            guard let colorString = self.readColor() else { return nil }
             let mathColor = MTMathColor()
-            mathColor.colorString = self.readColor()!
+            mathColor.colorString = colorString
             mathColor.innerList = self.buildInternal(true)
             return mathColor
         } else if command == "colorbox" {
             // A color command has 2 arguments
+            guard let colorString = self.readColor() else { return nil }
             let mathColorbox = MTMathColorbox()
-            mathColorbox.colorString = self.readColor()!
+            mathColorbox.colorString = colorString
             mathColorbox.innerList = self.buildInternal(true)
             return mathColorbox
         } else {
